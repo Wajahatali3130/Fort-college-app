@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#173b70">
+<title>Forte College of Excellence</title>
+<style>
+:root{--navy:#173b70;--blue:#2864b4;--bg:#f3f6fb;--card:#fff;--text:#172338}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:var(--bg);color:var(--text)}
+header{background:linear-gradient(135deg,#173b70,#2864b4);color:#fff;padding:24px 18px 30px;border-radius:0 0 22px 22px}
+header h1{font-size:23px;margin:0 0 6px}header p{margin:0;opacity:.9;font-size:13px}
+main{padding:16px;max-width:700px;margin:auto}.notice{background:#fff8db;border:1px solid #f1d778;padding:12px;border-radius:12px;font-size:13px;line-height:1.4;margin-bottom:14px}
+label{display:block;font-size:13px;font-weight:bold;margin:12px 0 6px}
+select,input,textarea,button{width:100%;padding:12px;border:1px solid #d4dce8;border-radius:10px;font-size:15px}
+button{background:var(--blue);color:white;border:0;font-weight:bold;margin-top:12px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:14px 0}
+.tile{background:var(--card);border-radius:14px;padding:16px;box-shadow:0 2px 9px #18385c0d}
+.tile b{display:block;margin:8px 0 4px}.tile span{font-size:12px;color:#617087}
+.panel{background:white;padding:16px;border-radius:14px;margin-top:14px}
+.hidden{display:none}.muted{font-size:12px;color:#65748a;line-height:1.5}.item{border-bottom:1px solid #e8edf4;padding:10px 0}
+@media(max-width:360px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header><h1>Forte College of Excellence</h1><p>College Management App · Starter Build</p></header>
+<main>
+<div class="notice"><b>Starter version:</b> This app interface is ready for testing. Accounts, shared online records, barcode camera scanning, and live sync must be connected and tested before real college use.</div>
+<div class="panel">
+<label for="role">Choose demo panel</label>
+<select id="role" onchange="showRole()"><option value="student">Student</option><option value="teacher">Teacher</option><option value="admin">Administrator</option></select>
+<label for="person">Name (demo only)</label><input id="person" placeholder="Enter your name">
+<button onclick="welcome()">Open dashboard</button>
+<p id="welcome" class="muted">Demo mode — no secure login yet.</p>
+</div>
+<div class="grid" id="tiles"></div>
+<div class="panel">
+<h3 id="formTitle">Student services</h3>
+<label for="kind">Request / activity</label>
+<select id="kind"><option>Leave request</option><option>Admission enquiry</option><option>Timetable question</option><option>Quiz practice</option></select>
+<label for="details">Details</label><textarea id="details" rows="3" placeholder="Write details here"></textarea>
+<button onclick="saveDemo()">Save on this phone</button>
+<p class="muted">Saved entries are stored only on this device. They are not sent to teachers or administrators yet.</p>
+<div id="entries"></div>
+</div>
+</main>
+<script>
+const panels={
+student:[["🗓️","Timetable","View class schedule"],["📝","Online quizzes","Practice and tests"],["📨","Leave request","Request leave"],["📊","Attendance","View attendance"],["🎓","Admission","Apply online"],["📣","Updates","College notices"]],
+teacher:[["▦","Barcode attendance","Scan student card (coming soon)"],["📝","Create quiz","Prepare student quizzes"],["🗓️","Update timetable","Publish schedule (coming soon)"],["📨","Leave approvals","Review requests"],["📊","Results","Review quiz results"],["📣","Class notices","Share updates"]],
+admin:[["👥","Student records","Manage students"],["👨‍🏫","Teacher records","Manage teachers"],["🎓","Admissions","Review applications"],["📊","Attendance reports","Review attendance"],["🗓️","Timetable","Manage schedules"],["⚙️","Settings","College settings"]]
+};
+function showRole(){let r=document.getElementById('role').value;document.getElementById('tiles').innerHTML=panels[r].map(x=>`<div class="tile"><div>${x[0]}</div><b>${x[1]}</b><span>${x[2]}</span></div>`).join('');document.getElementById('formTitle').textContent=r==='student'?'Student services':r==='teacher'?'Teacher workspace':'Administrator workspace';}
+function welcome(){let n=document.getElementById('person').value.trim()||'User';document.getElementById('welcome').textContent='Welcome, '+n+' · '+document.getElementById('role').selectedOptions[0].text+' demo panel';}
+function saveDemo(){let kind=document.getElementById('kind').value,details=document.getElementById('details').value.trim();if(!details){alert('Please enter details first.');return;}let all=JSON.parse(localStorage.getItem('forteDemoEntries')||'[]');all.unshift({kind,details,role:document.getElementById('role').value,date:new Date().toLocaleString()});localStorage.setItem('forteDemoEntries',JSON.stringify(all));document.getElementById('details').value='';renderEntries();alert('Saved on this phone only. Not sent online.');}
+function renderEntries(){let all=JSON.parse(localStorage.getItem('forteDemoEntries')||'[]');document.getElementById('entries').innerHTML=all.slice(0,10).map(x=>`<div class="item"><b>${escapeHtml(x.kind)}</b><div>${escapeHtml(x.details)}</div><span class="muted">${escapeHtml(x.role)} · ${escapeHtml(x.date)}</span></div>`).join('');}
+function escapeHtml(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+showRole();renderEntries();
+</script>
+</body></html>
